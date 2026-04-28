@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace MiniHttpServer.Http;
+﻿namespace MiniHttpServer.Http;
 
 public static class HttpRequestParser
 {

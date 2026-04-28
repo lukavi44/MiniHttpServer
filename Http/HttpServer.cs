@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Net;
+using System.Net.Sockets;
 using System.Text;
 
 namespace MiniHttpServer.Http
@@ -14,24 +15,33 @@ namespace MiniHttpServer.Http
             _middlewarePipeline = pipeline;
         }
 
-        public void Start()
+        public async Task StartAsync()
         {
             _listener.Start();
 
-            Console.WriteLine("HTTP Server started on port " + ((System.Net.IPEndPoint)_listener.LocalEndpoint).Port);
+            Console.WriteLine("HTTP Server started on port " + ((IPEndPoint)_listener.LocalEndpoint).Port);
 
             while (true)
             {
-                TcpClient client = _listener.AcceptTcpClient();
+                TcpClient client = await _listener.AcceptTcpClientAsync();
 
-                using NetworkStream stream = client.GetStream();
+                _ = Task.Run(() => HandleClientAsync(client));
+            }
+        }
 
+        private async Task HandleClientAsync(TcpClient client)
+        {
+            using (client)
+            using (NetworkStream stream = client.GetStream())
+            {
                 byte[] buffer = new byte[1024];
-                int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
 
                 string rawRequest = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
                 Console.WriteLine("----- RAW HTTP REQUEST -----");
+                Console.WriteLine(rawRequest);
+
                 var request = HttpRequestParser.Parse(rawRequest);
 
                 Console.WriteLine("----- PARSED REQUEST -----");
@@ -44,16 +54,10 @@ namespace MiniHttpServer.Http
                     Console.WriteLine($"{header.Key}: {header.Value}");
                 }
 
-                var pipeline = _middlewarePipeline;
-
-                HttpResponse response = pipeline(request);
+                HttpResponse response = _middlewarePipeline(request);
                 byte[] responseBytes = response.ToBytes();
 
-                stream.Write(responseBytes, 0, responseBytes.Length);
-
-                stream.Write(responseBytes, 0, responseBytes.Length);
-
-                client.Close();
+                await stream.WriteAsync(responseBytes, 0, responseBytes.Length);
             }
         }
     }

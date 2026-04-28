@@ -5,7 +5,7 @@ namespace MiniHttpServer;
 
 internal class Program
 {
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         var router = new Router();
 
@@ -23,6 +23,17 @@ internal class Program
                      { "id": 2, "name": "Mateja" }
                    ]
                    """
+        });
+
+        //Test conccureny
+        router.MapGet("/slow", request =>
+        {
+            Thread.Sleep(10000);
+
+            return new HttpResponse
+            {
+                Body = "Slow response finished"
+            };
         });
 
         router.MapPost("/users", request =>
@@ -53,6 +64,7 @@ internal class Program
 
         var builder = new MiddlewareBuilder();
 
+        // Exception handling middleware
         builder.Use(next => request =>
         {
             try
@@ -87,7 +99,8 @@ internal class Program
 
         RequestDelegate pipeline = builder.Build(router.Handle);
 
+
         var server = new HttpServer(5000, pipeline);
-        server.Start();
+        await server.StartAsync();
     }
 }

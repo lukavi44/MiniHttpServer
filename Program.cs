@@ -9,11 +9,6 @@ internal class Program
     {
         var router = new Router();
 
-        router.MapGet("/", request => Task.FromResult(new HttpResponse
-        {
-            Body = "Hello from MiniHttpServer"
-        }));
-
         router.MapGet("/users", request => Task.FromResult(new HttpResponse
         {
             ContentType = "application/json",
@@ -63,6 +58,17 @@ internal class Program
             });
         });
 
+        static string GetContentType(string path)
+        {
+            return Path.GetExtension(path) switch
+            {
+                ".html" => "text/html",
+                ".css" => "text/css",
+                ".js" => "application/javascript",
+                _ => "text/plain"
+            };
+        }
+
         var builder = new MiddlewareBuilder();
 
         // Exception handling middleware
@@ -96,6 +102,28 @@ internal class Program
             Console.WriteLine($"Response: {response.StatusCode}");
 
             return response;
+        });
+
+        builder.Use(next => async request =>
+        {
+            var path = request.Path == "/"
+                ? "/index.html"
+                : request.Path;
+
+            var filePath = "wwwroot" + path;
+
+            if (File.Exists(filePath))
+            {
+                var content = await File.ReadAllTextAsync(filePath);
+
+                return new HttpResponse
+                {
+                    ContentType = GetContentType(filePath),
+                    Body = content
+                };
+            }
+
+            return await next(request);
         });
 
         RequestDelegate pipeline = builder.Build(router.Handle);

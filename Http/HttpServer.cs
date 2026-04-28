@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace MiniHttpServer.Http
 {
@@ -34,7 +30,17 @@ namespace MiniHttpServer.Http
                 string rawRequest = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
                 Console.WriteLine("----- RAW HTTP REQUEST -----");
-                Console.WriteLine(rawRequest);
+                var request = HttpRequestParser.Parse(rawRequest);
+
+                Console.WriteLine("----- PARSED REQUEST -----");
+                Console.WriteLine($"Method: {request.Method}");
+                Console.WriteLine($"Path: {request.Path}");
+                Console.WriteLine($"Version: {request.HttpVersion}");
+
+                foreach (var header in request.Headers)
+                {
+                    Console.WriteLine($"{header.Key}: {header.Value}");
+                }
 
                 string responseBody = "Hello from MiniHttpServer";
 

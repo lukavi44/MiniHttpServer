@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using MiniHttpServer.Http.Core;
+using MiniHttpServer.Http.Middleware;
 
 namespace MiniHttpServer.Http
 {

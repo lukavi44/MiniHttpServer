@@ -1,4 +1,4 @@
-﻿namespace MiniHttpServer.Http;
+﻿namespace MiniHttpServer.Http.Middleware;
 
 public class MiddlewareBuilder
 {

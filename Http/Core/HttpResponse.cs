@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace MiniHttpServer.Http;
+namespace MiniHttpServer.Http.Core;
 
 public class HttpResponse
 {

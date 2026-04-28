@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace MiniHttpServer.Http;
+namespace MiniHttpServer.Http.Core;
 
 public class HttpRequest
 {

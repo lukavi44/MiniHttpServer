@@ -1,4 +1,4 @@
-﻿using MiniHttpServer.Http;
+﻿using MiniHttpServer.Http.Core;
 
 public class Router
 {

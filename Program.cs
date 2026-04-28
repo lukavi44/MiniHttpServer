@@ -1,4 +1,6 @@
 ﻿using MiniHttpServer.Http;
+using MiniHttpServer.Http.Core;
+using MiniHttpServer.Http.Middleware;
 using MiniHttpServer.Models;
 
 namespace MiniHttpServer;

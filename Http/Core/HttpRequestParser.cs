@@ -1,4 +1,4 @@
-﻿namespace MiniHttpServer.Http;
+﻿namespace MiniHttpServer.Http.Core;
 
 public static class HttpRequestParser
 {

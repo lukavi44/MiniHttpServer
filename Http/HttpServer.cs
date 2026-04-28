@@ -6,10 +6,12 @@ namespace MiniHttpServer.Http
     public class HttpServer
     {
         private readonly TcpListener _listener;
+        private readonly Router _router;
 
-        public HttpServer(int port)
+        public HttpServer(int port, Router router)
         {
             _listener = new TcpListener(System.Net.IPAddress.Any, port);
+            _router = router;
         }
 
         public void Start()
@@ -42,15 +44,11 @@ namespace MiniHttpServer.Http
                     Console.WriteLine($"{header.Key}: {header.Value}");
                 }
 
-                string responseBody = "Hello from MiniHttpServer";
+                HttpResponse response = _router.Handle(request);
 
-                string response = "HTTP/1.1 200 OK\r\n" +
-                                  "Content-Type: text/plain\r\n" +
-                                  "Content-Length: " + responseBody.Length + "\r\n" +
-                                  "\r\n" +
-                                  responseBody;
+                byte[] responseBytes = response.ToBytes();
 
-                byte[] responseBytes = Encoding.UTF8.GetBytes(response);
+                stream.Write(responseBytes, 0, responseBytes.Length);
 
                 stream.Write(responseBytes, 0, responseBytes.Length);
 

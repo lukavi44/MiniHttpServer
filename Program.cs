@@ -53,6 +53,26 @@ internal class Program
 
         var builder = new MiddlewareBuilder();
 
+        builder.Use(next => request =>
+        {
+            try
+            {
+                return next(request);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Unhandled exception:");
+                Console.WriteLine(ex);
+
+                return new HttpResponse
+                {
+                    StatusCode = 500,
+                    ReasonPhrase = "Internal Server Error",
+                    Body = "Internal Server Error"
+                };
+            }
+        });
+
         // Logging middleware
         builder.Use(next => request =>
         {

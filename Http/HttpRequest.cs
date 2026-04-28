@@ -1,4 +1,6 @@
-﻿namespace MiniHttpServer.Http;
+﻿using System.Text.Json;
+
+namespace MiniHttpServer.Http;
 
 public class HttpRequest
 {
@@ -8,4 +10,17 @@ public class HttpRequest
     public string Body { get; set; } = string.Empty;
 
     public Dictionary<string, string> Headers { get; set; } = new();
+
+    public T? ReadJsonBody<T>()
+    {
+        if (string.IsNullOrWhiteSpace(Body))
+        {
+            return default;
+        }
+
+        return JsonSerializer.Deserialize<T>(Body, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+    }
 }

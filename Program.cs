@@ -1,4 +1,5 @@
 ﻿using MiniHttpServer.Http;
+using MiniHttpServer.Models;
 
 namespace MiniHttpServer;
 
@@ -26,12 +27,27 @@ internal class Program
 
         router.MapPost("/users", request =>
         {
-            Console.WriteLine("BODY:");
-            Console.WriteLine(request.Body);
+            User? user = request.ReadJsonBody<User>();
+
+            if (user is null || string.IsNullOrWhiteSpace(user.Name))
+            {
+                return new HttpResponse
+                {
+                    StatusCode = 400,
+                    ReasonPhrase = "Bad Request",
+                    Body = "Name is required"
+                };
+            }
 
             return new HttpResponse
             {
-                Body = "User received"
+                ContentType = "application/json",
+                Body = $$"""
+               {
+                 "message": "User created",
+                 "name": "{{user.Name}}"
+               }
+               """
             };
         });
 

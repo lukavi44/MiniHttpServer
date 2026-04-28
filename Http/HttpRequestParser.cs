@@ -34,6 +34,14 @@ public static class HttpRequestParser
             request.Headers[key] = value;
         }
 
+        int emptyLineIndex = Array.IndexOf(lines, "");
+
+        if (emptyLineIndex != -1 && emptyLineIndex < lines.Length - 1)
+        {
+            var bodyLines = lines.Skip(emptyLineIndex + 1);
+            request.Body = string.Join("\r\n", bodyLines);
+        }
+
         return request;
     }
 }

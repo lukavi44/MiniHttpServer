@@ -9,6 +9,11 @@ public class Router
         _routes[$"GET {path}"] = handler;
     }
 
+    public void MapPost(string path, Func<HttpRequest, HttpResponse> handler)
+    {
+        _routes[$"POST {path}"] = handler;
+    }
+
     public HttpResponse Handle(HttpRequest request)
     {
         var key = $"{request.Method} {request.Path}";

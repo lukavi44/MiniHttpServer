@@ -24,6 +24,17 @@ internal class Program
                    """
         });
 
+        router.MapPost("/users", request =>
+        {
+            Console.WriteLine("BODY:");
+            Console.WriteLine(request.Body);
+
+            return new HttpResponse
+            {
+                Body = "User received"
+            };
+        });
+
         var builder = new MiddlewareBuilder();
 
         // Logging middleware

@@ -9,12 +9,12 @@ internal class Program
     {
         var router = new Router();
 
-        router.MapGet("/", request => new HttpResponse
+        router.MapGet("/", request => Task.FromResult(new HttpResponse
         {
-            Body = "Hello from MiniHttpServer!"
-        });
+            Body = "Hello from MiniHttpServer"
+        }));
 
-        router.MapGet("/users", request => new HttpResponse
+        router.MapGet("/users", request => Task.FromResult(new HttpResponse
         {
             ContentType = "application/json",
             Body = """
@@ -23,12 +23,12 @@ internal class Program
                      { "id": 2, "name": "Mateja" }
                    ]
                    """
-        });
+        }));
 
         //Test conccureny
-        router.MapGet("/slow", request =>
+        router.MapGet("/slow", async request =>
         {
-            Thread.Sleep(10000);
+            await Task.Delay(5000);
 
             return new HttpResponse
             {
@@ -42,15 +42,16 @@ internal class Program
 
             if (user is null || string.IsNullOrWhiteSpace(user.Name))
             {
-                return new HttpResponse
+                return Task.FromResult( new HttpResponse
                 {
                     StatusCode = 400,
                     ReasonPhrase = "Bad Request",
                     Body = "Name is required"
-                };
+                });
+
             }
 
-            return new HttpResponse
+            return Task.FromResult(new HttpResponse
             {
                 ContentType = "application/json",
                 Body = $$"""
@@ -59,17 +60,17 @@ internal class Program
                  "name": "{{user.Name}}"
                }
                """
-            };
+            });
         });
 
         var builder = new MiddlewareBuilder();
 
         // Exception handling middleware
-        builder.Use(next => request =>
+        builder.Use(next => async request =>
         {
             try
             {
-                return next(request);
+                return await  next(request);
             }
             catch (Exception ex)
             {
@@ -86,11 +87,11 @@ internal class Program
         });
 
         // Logging middleware
-        builder.Use(next => request =>
+        builder.Use(next => async request =>
         {
             Console.WriteLine($"[{DateTime.Now}] {request.Method} {request.Path}");
 
-            var response = next(request);
+            var response = await next(request);
 
             Console.WriteLine($"Response: {response.StatusCode}");
 
@@ -98,7 +99,6 @@ internal class Program
         });
 
         RequestDelegate pipeline = builder.Build(router.Handle);
-
 
         var server = new HttpServer(5000, pipeline);
         await server.StartAsync();

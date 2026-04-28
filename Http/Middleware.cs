@@ -1,3 +1,3 @@
 ﻿namespace MiniHttpServer.Http;
 
-public delegate HttpResponse RequestDelegate(HttpRequest request);
+public delegate Task<HttpResponse> RequestDelegate(HttpRequest request);

@@ -54,7 +54,7 @@ namespace MiniHttpServer.Http
                     Console.WriteLine($"{header.Key}: {header.Value}");
                 }
 
-                HttpResponse response = _middlewarePipeline(request);
+                HttpResponse response = await _middlewarePipeline(request);
                 byte[] responseBytes = response.ToBytes();
 
                 await stream.WriteAsync(responseBytes, 0, responseBytes.Length);

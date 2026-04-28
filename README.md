@@ -70,7 +70,7 @@ http://localhost:5000
 
 ---
 
-## 🚀 Future Improvements
+## Future Improvements
 
 - Query params
 - DI container

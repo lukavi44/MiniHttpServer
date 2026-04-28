@@ -58,6 +58,22 @@ internal class Program
             });
         });
 
+        router.MapGet("/users/{id}", request =>
+        {
+            var id = request.RouteParameters["id"];
+
+            return Task.FromResult(new HttpResponse
+            {
+                ContentType = "application/json",
+                Body = $$"""
+               {
+                 "id": "{{id}}",
+                 "name": "User {{id}}"
+               }
+               """
+            });
+        });
+
         static string GetContentType(string path)
         {
             return Path.GetExtension(path) switch

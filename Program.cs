@@ -24,7 +24,23 @@ internal class Program
                    """
         });
 
-        var server = new HttpServer(5000, router);
+        var builder = new MiddlewareBuilder();
+
+        // Logging middleware
+        builder.Use(next => request =>
+        {
+            Console.WriteLine($"[{DateTime.Now}] {request.Method} {request.Path}");
+
+            var response = next(request);
+
+            Console.WriteLine($"Response: {response.StatusCode}");
+
+            return response;
+        });
+
+        RequestDelegate pipeline = builder.Build(router.Handle);
+
+        var server = new HttpServer(5000, pipeline);
         server.Start();
     }
 }

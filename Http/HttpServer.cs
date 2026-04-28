@@ -6,12 +6,12 @@ namespace MiniHttpServer.Http
     public class HttpServer
     {
         private readonly TcpListener _listener;
-        private readonly Router _router;
+        private readonly RequestDelegate _middlewarePipeline;
 
-        public HttpServer(int port, Router router)
+        public HttpServer(int port, RequestDelegate pipeline)
         {
             _listener = new TcpListener(System.Net.IPAddress.Any, port);
-            _router = router;
+            _middlewarePipeline = pipeline;
         }
 
         public void Start()
@@ -44,8 +44,9 @@ namespace MiniHttpServer.Http
                     Console.WriteLine($"{header.Key}: {header.Value}");
                 }
 
-                HttpResponse response = _router.Handle(request);
+                var pipeline = _middlewarePipeline;
 
+                HttpResponse response = pipeline(request);
                 byte[] responseBytes = response.ToBytes();
 
                 stream.Write(responseBytes, 0, responseBytes.Length);
